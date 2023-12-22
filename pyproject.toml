@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "qt"
+version = "1.0.0"
+description = "fast_api demo on the fly"
+authors = ["vortexdude <nitinnamdeo456@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+fastapi = "^0.105.0"
+uvicorn = "^0.25.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
