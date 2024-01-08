@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Body
 from fastapi.encoders import jsonable_encoder
 from api.server.tags import users_tag
-from api.server.models.users import UsersSchema, UpdateUserModel
+from api.server.models.users import UsersSchema, UpdateUserModel, ResponceModel
 from api.server.database import (
     add_user,
     retrieve_users
@@ -16,7 +16,9 @@ router = APIRouter()
 
 @router.post("/",  response_description="User data added into the database")
 async def create_user(user: UsersSchema = Body(...)):
-    return {"user_fname": user.fname, "user_id": user_id}
+    user = jsonable_encoder(user)
+    new_user = await add_user(user)
+    return ResponceModel(new_user)
 
 # @user_route.put("/user/{user_id}", tags=users_tag)
 # async def update_user(user_id: str, user: UpdateUserModel):
