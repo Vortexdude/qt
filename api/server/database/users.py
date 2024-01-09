@@ -1,27 +1,15 @@
 from bson.objectid import ObjectId
-from motor import motor_asyncio
+from api.server.database import db
 import pymongo
 
-host = "database"
-MONGO_DB = "trasactions"
-MONGO_USER = "admin"
-MONGO_PASS = "admin"
-port = 27017
-MONGO_DETAILS = "mongodb://localhost:27017"
-
-client = motor_asyncio.AsyncIOMotorClient(MONGO_DETAILS)
-
-database = client.Global_users  # <--- database name
-
-user_collection = database.get_collection("user_collection")  #<--- collection name
+user_collection = db.get_collection("user_collection")  #<--- collection name
 
 def user_helper(user) -> dict:
     return {
         "id": str(user["_id"]),
         "fname": user["fname"],
         "lname": user["lname"],
-        "email": user["email"],
-        "password": user["password"]
+        "email": user["email"]
     }
 
 

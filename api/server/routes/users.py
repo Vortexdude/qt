@@ -7,7 +7,7 @@ from api.server.models.users import (
     ErrorResponceModel
 )
 
-from api.server.database import (
+from api.server.database.users import (
     add_user,
     retrieve_users,
     update_user_details
