@@ -1,13 +1,26 @@
-from typing import Optional, ForwardRef
+from typing import Optional
+import re
+from pydantic import BaseModel, Field, SecretStr, field_serializer, validator
 
-from pydantic import BaseModel, Field, SecretStr
+regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
 
+class Model(BaseModel):
+    password: SecretStr
 
-class UsersSchema(BaseModel):
+    @field_serializer('password', when_used='always')
+    def dump_secret(self, v):
+        return v.get_secret_value()
+
+class UsersSchema(Model):
     fname: str = Field(...)
     lname: str = Field(...)
     email: str = Field(...)
-    password:  Optional[str]
+
+    @validator('email')
+    def ensure_email(cls, v):
+        if not (re.fullmatch(regex, v)):
+            raise ValueError('Invalid email')
+        return v
 
     class Config:
         json_schema_extra = {
@@ -19,16 +32,12 @@ class UsersSchema(BaseModel):
             }
         }
 
-class UpdateUserModel(BaseModel):
+class UpdateUserModel(Model):
     fname: Optional[str]
     lname: Optional[str]
     email: Optional[str]
-    password: SecretStr
 
     class Config:
-        json_encoders = {
-            SecretStr: lambda v: v.get_secret_value() if v else None
-         }
         json_schema_extra = {
             "example": {
                 "fname": "Raj",
@@ -46,7 +55,7 @@ def ResponceModel(data, message):
         "messge": message
     }
 
-def ErrorResponceModel(erro, code, message):
+def ErrorResponceModel(error, code, message):
     return {
         "error": error,
         "code": code,

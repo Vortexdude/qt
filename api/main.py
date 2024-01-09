@@ -1,12 +1,13 @@
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
-from api.server.routes.users import router as UserRouter
+from routes import users_route
 
 app = FastAPI()
-app.include_router(UserRouter ,tags=["Users"], prefix="/user")
 
-@app.get("/", tags=["root"])
-async def read_root():
+@app.get("/")
+async def root():
     data = jsonable_encoder({"message": "Hello There!"})
     return JSONResponse(content = data)
+
+app.include_router(users_route)
