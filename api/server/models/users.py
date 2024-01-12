@@ -1,8 +1,6 @@
 from typing import Optional
-import re
 from pydantic import BaseModel, Field, SecretStr, field_serializer, validator
-
-regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
+from api.utils import ensure_email
 
 class Model(BaseModel):
     password: SecretStr
@@ -17,10 +15,8 @@ class UsersSchema(Model):
     email: str = Field(...)
 
     @validator('email')
-    def ensure_email(cls, v):
-        if not (re.fullmatch(regex, v)):
-            raise ValueError('Invalid email')
-        return v
+    def validate_email(cls, v):
+        return ensure_email(email=v)
 
     class Config:
         json_schema_extra = {

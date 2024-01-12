@@ -18,6 +18,30 @@ class UserData:
             "lname": user["lname"],
             "email": user["email"]
         }
+    
+    @classmethod
+    async def find_by_email(cls, email: str) -> dict:
+        user = await user_collection.find_one({'email': email})
+        if user:
+            _user =  cls.to_json(user)
+            _user['status'] = True
+            return _user
+        else:
+            return {"status": False}
+
+    @staticmethod
+    async def user_validation(email: str) -> tuple:
+        user = await user_collection.find_one({'email': email})
+        if user:
+            return (True,{
+                'hashed_password': user['hashed_password'],
+                'id': str(user['_id']),
+                'disabled': user['disabled'],
+                'fname': user['fname']
+            })
+        else:
+            return (False, "")
+
 
     @classmethod
     async def fetch_all_users(cls) -> list:
@@ -41,12 +65,9 @@ class UserData:
 
         except errors.DuplicateKeyError as E:
             if "email" in vars(E)['_OperationFailure__details']['keyPattern']:
-                return {"status": False, "Key": "email"}
+                return {"status": False, "key": "email"}
             else:
                 return {"status": False, "key": vars(E)['_OperationFailure__details']['keyPattern']}
-
-        finally:
-            return {"status": False, "error": "Unknown Error with the database"}
 
     @staticmethod
     async def update_record(id: str, user_data: dict) -> dict:
