@@ -29,8 +29,20 @@ class UserData:
         else:
             return {"status": False}
 
+    @classmethod
+    async def find_by_fname(cls, fname: str) -> dict:
+        user = await user_collection.find_one({'fname': fname})
+        if user:
+            _user =  cls.to_json(user)
+            _user['status'] = True
+            return _user
+        else:
+            return {"status": False}
+
     @staticmethod
     async def user_validation(email: str) -> tuple:
+        """ Only used for login methods """
+
         user = await user_collection.find_one({'email': email})
         if user:
             return (True,{
